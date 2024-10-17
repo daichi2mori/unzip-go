@@ -17,11 +17,9 @@ var cfgFile string = "config.yml"
 var versionFlag bool
 
 var rootCmd = &cobra.Command{
-	Use:   "zgo",
-	Short: "解凍や圧縮のフォルダを指定して実行できます",
-	Long:  `解凍や圧縮のフォルダを指定して実行できます`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
+	Use:   "unzip",
+	Short: "解凍フォルダを指定して実行できます",
+	Long:  `選択した圧縮ファイルを解凍できます`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if versionFlag {
 			version := viper.GetString("version")
