@@ -43,7 +43,7 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "バージョン情報を表示します")
 }
 
 func initConfig() {
