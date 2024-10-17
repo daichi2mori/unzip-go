@@ -1,4 +1,4 @@
-module unzip-go
+module github.com/daichi2mori/unzip-go
 
 go 1.23.2
 
