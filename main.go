@@ -11,15 +11,9 @@ import (
 	"github.com/bodgit/sevenzip"
 	"github.com/schollz/progressbar/v3"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-type Config struct {
-	version string
-}
-
-var config Config
-var cfgFile string = "config.yml"
+var version string = "v1.0.1"
 var versionFlag bool
 
 var all bool
@@ -33,12 +27,7 @@ var rootCmd = &cobra.Command{
 	Long:  `選択した圧縮ファイルを解凍できます`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if versionFlag {
-			version := viper.GetString("version")
-			if version == "" {
-				fmt.Println("バージョン情報が見つかりません")
-			} else {
-				fmt.Println("バージョン: ", version)
-			}
+			fmt.Println("バージョン: ", version)
 			os.Exit(0)
 		}
 
@@ -70,7 +59,6 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
 	rootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "バージョン情報を表示します")
 	rootCmd.Flags().BoolVarP(&all, "all", "a", false, "すべてのファイルを解凍しますか？")
 }
@@ -80,17 +68,6 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
-}
-
-func initConfig() {
-	viper.SetConfigFile(cfgFile)
-
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	viper.ConfigFileUsed()
 }
 
 func isExtractableFile(fileName string) bool {
