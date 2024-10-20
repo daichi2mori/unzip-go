@@ -2,18 +2,17 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/bodgit/sevenzip"
+	"github.com/gen2brain/go-unarr"
 	"github.com/schollz/progressbar/v3"
 	"github.com/spf13/cobra"
 )
 
-var version string = "v1.0.1"
+var version string = "v1.1.0"
 var versionFlag bool
 
 var all bool
@@ -53,7 +52,7 @@ var rootCmd = &cobra.Command{
 				}
 				bar.Add(1)
 			}
-			fmt.Println("\nすべてのファイルが解凍されました")
+			fmt.Println("\n終了しました")
 		}
 	},
 }
@@ -90,47 +89,19 @@ func askUser(file string) bool {
 	return answer == "Yes"
 }
 
-func extractArchive(archive string) error {
-	r, err := sevenzip.OpenReader(archive)
+func extractArchive(file string) error {
+	archive, err := unarr.NewArchive(file)
 	if err != nil {
 		return err
 	}
-	defer r.Close()
+	defer archive.Close()
 
-	for _, f := range r.File {
-		if err = extractFile(f); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func extractFile(f *sevenzip.File) error {
-	// 解凍するファイルの読み取りストリームを開く
-	rc, err := f.Open()
-	if err != nil {
+	dirName := strings.TrimSuffix(file, filepath.Ext(file)) // フォルダ名取得
+	if err = os.Mkdir(dirName, os.ModePerm); err != nil {
 		return err
 	}
-	defer rc.Close()
 
-	// ファイル名のパスを作成
-	outPath := filepath.Join(".", f.Name)
-
-	// ディレクトリの場合、ディレクトリを作成して終了
-	if f.FileInfo().IsDir() {
-		return os.MkdirAll(outPath, f.Mode())
-	}
-
-	// ファイルを作成して中身を書き出す
-	outFile, err := os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-	if err != nil {
-		return err
-	}
-	defer outFile.Close()
-
-	// ストリームからファイルへコピー
-	_, err = io.Copy(outFile, rc)
+	_, err = archive.Extract(dirName)
 	if err != nil {
 		return err
 	}
